@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": ["es2017"],
+    "module": "commonjs",
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "esModuleInterop": true
+  },
+  "include": ["src", "common", "users", "src/app.ts"]
+}
