@@ -1,5 +1,7 @@
 import { CommonRoutesConfig } from "../common/common.routes.config";
-import { Application, Request, Response, NextFunction } from "express";
+import usersController from "./controllers/users.controller";
+import usersMiddleware from "./middleware/users.middleware";
+import { Application } from "express";
 
 export class UsersRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
@@ -9,30 +11,31 @@ export class UsersRoutes extends CommonRoutesConfig {
   configureRoutes() {
     this.app
       .route("/users")
-      .get((req: Request, res: Response) => {
-        res.status(200).send("List of users");
-      })
-      .post((req: Request, res: Response) => {
-        res.status(200).send("Post to users");
-      });
+      .get(usersController.listUsers)
+      .post(
+        usersMiddleware.validateRequiredUserBodyFields,
+        usersMiddleware.validateSameEmailDoesntExist,
+        usersController.createUser
+      );
+
+    this.app.param("userId", usersMiddleware.extractUserId);
 
     this.app
       .route("/users/:userId")
-      .all((req: Request, res: Response, next: NextFunction) => {
-        next();
-      })
-      .get((req: Request, res: Response) => {
-        res.status(200).send(`GET requested for id ${req.params.userId}`);
-      })
-      .put((req: Request, res: Response) => {
-        res.status(200).send(`PUT requested for id ${req.params.userId}`);
-      })
-      .patch((req: Request, res: Response) => {
-        res.status(200).send(`PATCH requested for id ${req.params.userId}`);
-      })
-      .delete((req: Request, res: Response) => {
-        res.status(200).send(`DELETE requested for id ${req.params.userId}`);
-      });
+      .all(usersMiddleware.validateUserExists)
+      .get(usersController.getUserByid)
+      .delete(usersController.removeUser);
+
+    this.app.put("/users/:userId", [
+      usersMiddleware.validateRequiredUserBodyFields,
+      usersMiddleware.validateSameEmailBelongToSameUser,
+      usersController.put,
+    ]);
+
+    this.app.patch("/users/:userId", [
+      usersMiddleware.validatePatchEmail,
+      usersController.patch,
+    ]);
 
     return this.app;
   }
