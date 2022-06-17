@@ -14,11 +14,11 @@ class UsersService implements CRUD {
   }
 
   async list(limit: number, page: number) {
-    return usersDao.getUsers();
+    return usersDao.getUsers(limit, page);
   }
 
   async patchById(id: string, resource: PatchUserDto) {
-    return usersDao.patchUserById(id, resource);
+    return usersDao.updateUserById(id, resource);
   }
 
   async readByid(id: string) {
@@ -26,11 +26,15 @@ class UsersService implements CRUD {
   }
 
   async putById(id: string, resource: PutUserDto) {
-    return usersDao.putUserById(id, resource);
+    return usersDao.updateUserById(id, resource);
   }
 
   async getUserByEmail(email: string) {
     return usersDao.getUserByEmail(email);
+  }
+
+  async getUserByEmailWithPassword(email: string) {
+    return usersDao.getUserByEmailWithPassword(email);
   }
 }
 
