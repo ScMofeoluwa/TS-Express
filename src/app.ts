@@ -1,11 +1,18 @@
+import dotenv from "dotenv";
+const dotenvResult = dotenv.config();
+if (dotenvResult.error) {
+  throw dotenvResult.error;
+}
+
 import express from "express";
 import * as http from "http";
 import * as winston from "winston";
 import * as expressWinston from "express-winston";
 import cors from "cors";
+import debug from "debug";
 import { CommonRoutesConfig } from "./common/common.routes.config";
 import { UsersRoutes } from "./users/users.routes.config";
-import debug from "debug";
+import { AuthRoutes } from "./auth/auth.routes.config";
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
@@ -32,6 +39,7 @@ if (!process.env.DEBUG) {
 app.use(expressWinston.logger(loggerOptions));
 
 routes.push(new UsersRoutes(app));
+routes.push(new AuthRoutes(app));
 
 const runningMessage = `Server running at http://localhost:${port}`;
 app.get("/", (req: express.Request, res: express.Response) => {
